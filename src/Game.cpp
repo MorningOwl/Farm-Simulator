@@ -2,7 +2,6 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
-#include <chrono>
 #include <Windows.h>
 #include "Crop.h"
 #include "Maps.h"
@@ -52,21 +51,8 @@ int main()
 		cout << "1.New Game\n2.Load Game\n3.Quit\n\n";
 		cin >> det;
 		system("cls");
+		if (det == '1') break;
 		if (det == '3') return 0;
-
-		if (det == '1')
-		{
-			while (true)
-			{
-				cout << "Enter your name: ";
-				cin >> player.name;
-				cout << "\nIs this name correct?\n1.Yes\n2.No\n\n";
-				cin >> det;
-				system("cls");
-				if (det == '1') break;
-			}
-			break;
-		}
 
 		if (det == '2')
 		{
@@ -739,7 +725,7 @@ void saveGame()
 	save << day << " " << month << " " << year << endl;
 	save << numSeeds << " " << numCrops << " " << numFruits << endl;
 	save << day_end << endl;
-	save << player.name << " " << player.x << " " << player.y << " " << player.funds << endl;
+	save << player.x << " " << player.y << " " << player.funds << endl;
 
 	switch (map)
 	{
@@ -815,7 +801,7 @@ void loadGame()
 {
 	load >> day >> month >> year;
 	load >> numSeeds >> numCrops >> numFruits >> day_end;
-	load >> player.name >> player.x >> player.y >> player.funds;
+	load >> player.x >> player.y >> player.funds;
 
 	load >> temp;
 	switch (temp)
