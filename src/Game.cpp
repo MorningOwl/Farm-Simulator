@@ -296,7 +296,10 @@ void getUserInput()
 			case WATERING_CAN:
 				for (int i = 1; i <= numCrops; i++)
 					if (crop[i] == player)
+					{
 						crop[i].is_watered = true;
+						break;
+					}
 				break;
 			}
 
@@ -312,11 +315,13 @@ void getUserInput()
 					crop[i].is_new = true;
 					crop[i].days_watered = 0;
 					numFruits++;
+					numCrops--;
 					if (bag[numItems - 1] != FRUIT)
 					{
 						bag[numItems] = FRUIT;
 						numItems++;
 					}
+					break;
 				}
 
 			if (farm[player.y][player.x] == 10 && _item == FRUIT && numFruits > 0)
