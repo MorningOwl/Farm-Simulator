@@ -727,49 +727,12 @@ void saveGame()
 		exit(EXIT_SUCCESS);
 	}
 
-	save << day << " " << month << " " << year << endl;
-	save << numSeeds << " " << numCrops << " " << numFruits << endl;
-	save << day_end << endl;
-	save << player.x << " " << player.y << " " << player.funds << endl;
-
-	switch (map)
-	{
-	case FARM: save << 0; break;
-	case HOUSE: save << 1; break;
-	case STREET: save << 2;
-	}
-
-	save << endl;
-
-	switch (_item)
-	{
-	case SEED: save << 0; break;
-	case WATERING_CAN: save << 1; break;
-	case FRUIT: save << 2;
-	}
-
-	save << endl << itemNo << " " << numItems << endl;
-
-	for (int i = 0; i < numItems; i++)
-	{
-		switch (bag[i])
-		{
-		case SEED: save << 0 << " "; break;
-		case WATERING_CAN: save << 1 << " "; break;
-		case FRUIT: save << 2 << " "; break;
-		}
-	}
-
-	save << endl;
-
 	for (int y = 0; y < 20; y++)
 	{
 		for (int x = 0; x < 40; x++)
 			save << farm[y][x] << " ";
 		save << endl;
 	}
-
-	save << endl;
 
 	for (int y = 0; y < 10; y++)
 	{
@@ -778,8 +741,6 @@ void saveGame()
 		save << endl;
 	}
 
-	save << endl;
-
 	for (int y = 0; y < 8; y++)
 	{
 		for (int x = 0; x < 20; x++)
@@ -787,15 +748,42 @@ void saveGame()
 		save << endl;
 	}
 
+	switch (map)
+	{
+		case FARM: save << 0 << endl; break;
+		case HOUSE: save << 1 << endl; break;
+		case STREET: save << 2 << endl;
+	}
+
+	save << player.x << " " << player.y << " " << player.funds << endl;
+	save << day << " " << month << " " << year << endl;
+	save << day_end << endl;
+	save << numSeeds << " " << numCrops << " " << numFruits << endl;
+
+	for (int i = 0; i < numItems; i++)
+	{
+		switch (bag[i])
+		{
+			case SEED: save << 0 << " "; break;
+			case WATERING_CAN: save << 1 << " "; break;
+			case FRUIT: save << 2 << " ";
+		}
+	}
+
 	save << endl;
+
+	switch (_item)
+	{
+		case SEED: save << 0 << endl; break;
+		case WATERING_CAN: save << 1 << endl; break;
+		case FRUIT: save << 2 << endl;
+	}
 
 	for (int i = 1; i <= numCrops; i++)
 	{
-		save << endl << crop[i].x << " " << crop[i].y << " " << crop[i].is_watered << " " << crop[i].days_watered;
-		save << " " << crop[i].is_grown << " " << crop[i].is_harvested;
+		save << crop[i].x << " " << crop[i].y << " " << crop[i].is_watered << " " << crop[i].days_watered;
+		save << " " << crop[i].is_grown << " " << crop[i].is_harvested << endl;
 	}
-	save << "\n\n";
-
 
 	save.close();
 	cout << "Game saved!\n\n";
@@ -804,9 +792,17 @@ void saveGame()
 
 void loadGame()
 {
-	load >> day >> month >> year;
-	load >> numSeeds >> numCrops >> numFruits >> day_end;
-	load >> player.x >> player.y >> player.funds;
+	for (int y = 0; y < 20; y++)
+		for (int x = 0; x < 40; x++)
+			load >> farm[y][x];
+
+	for (int y = 0; y < 10; y++)
+		for (int x = 0; x < 20; x++)
+			load >> house[y][x];
+
+	for (int y = 0; y < 8; y++)
+		for (int x = 0; x < 20; x++)
+			load >> street[y][x];
 
 	load >> temp;
 	switch (temp)
@@ -816,34 +812,29 @@ void loadGame()
 	case 2: map = STREET;
 	}
 
-	load >> temp;
-	switch (temp)
-	{
-	case 0: _item = SEED; break;
-	case 1: _item = WATERING_CAN; break;
-	case 2: _item = FRUIT;
-	}
-
-	load >> itemNo >> numItems;
+	load >> player.x >> player.y >> player.funds;
+	load >> day >> month >> year;
+	load >> day_end;
+	load >> numSeeds >> numCrops >> numFruits;
 
 	for (int i = 0; i < numItems; i++)
 	{
 		load >> temp;
 		switch (temp)
 		{
-		case 0: bag[i] = SEED; break;
-		case 1: bag[i] = WATERING_CAN; break;
-		case 2: bag[i] = FRUIT; break;
+			case 0: bag[i] = SEED; break;
+			case 1: bag[i] = WATERING_CAN; break;
+			case 2: bag[i] = FRUIT; break;
 		}
 	}
 
-	for (int y = 0; y < 20; y++)
-		for (int x = 0; x < 40; x++)
-			load >> farm[y][x];
-
-	for (int y = 0; y < 10; y++)
-		for (int x = 0; x < 20; x++)
-			load >> house[y][x];
+	load >> temp;
+	switch (temp)
+	{
+		case 0: _item = SEED; break;
+		case 1: _item = WATERING_CAN; break;
+		case 2: _item = FRUIT;
+	}
 
 	for (int i = 1; i <= numCrops; i++)
 		load >> crop[i].x >> crop[i].y >> crop[i].is_watered >> crop[i].days_watered >> crop[i].is_grown >> crop[i].is_harvested;
