@@ -1,7 +1,7 @@
 #pragma once
 
 enum Map { FARM, HOUSE, STREET, SHOP };
-enum Item { NONE, SEED, WATERING_CAN, FRUIT };
+enum Item { NONE, TURNIPSEED, WATERING_CAN, TURNIP };
 
 
 class Player

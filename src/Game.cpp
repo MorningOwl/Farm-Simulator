@@ -13,11 +13,11 @@ using namespace std;
 
 Map map = FARM;
 Player player(6, 30);
-Crop crop[244];
-int numCrops = 9, numSeeds = 9, numFruits = 0;
+Crop turnip[244];
+int numTurnips = 9, numTurnipSeeds = 9, numTurnips_h = 0;
 
-Item bag[6] = { SEED, WATERING_CAN };
-Item _item = SEED;
+Item bag[6] = { TURNIPSEED, WATERING_CAN };
+Item _item = TURNIPSEED;
 int itemNo = 1, numItems = 2;
 
 ofstream save;
@@ -128,7 +128,7 @@ void drawFarm()
 				cout << "o";
 
 			else if (farm[y][x] == 18)
-				cout << "O";
+				cout << "T";
 
 			else if (farm[y][x] == 0 || farm[y][x] == 2 || farm[y][x] == 8 || farm[y][x] == 20)
 				cout << " ";
@@ -213,16 +213,16 @@ void drawScreen()
 
 	switch (_item)
 	{
-	case SEED:
-		cout << " Seeds (x" << numSeeds << ")\n\n";
+	case TURNIPSEED:
+		cout << "Turnip Seeds (x" << numTurnipSeeds << ")\n\n";
 		break;
 
 	case WATERING_CAN:
 		cout << "Watering can\n\n";
 		break;
 
-	case FRUIT:
-		cout << "Fruit (x" << numFruits << ")\n\n";
+	case TURNIP:
+		cout << "Turnip (x" << numTurnips_h << ")\n\n";
 		break;
 	}
 }
@@ -275,18 +275,18 @@ void getUserInput()
 		case 'f':
 			switch (_item)
 			{
-			case SEED:
-				if (farm[player.y][player.x] == 8 && numSeeds > 0)
+			case TURNIPSEED:
+				if (farm[player.y][player.x] == 8 && numTurnipSeeds > 0)
 				{
-					for (int i = 1; i <= numCrops; i++)
+					for (int i = 0; i < numTurnips; i++)
 					{
-						if (crop[i].is_new)
+						if (turnip[i].is_new)
 						{
-							crop[i] = player;
-							crop[i].is_new = false;
+							turnip[i] = player;
+							turnip[i].is_new = false;
 							farm[player.y][player.x] = 12;
-							numSeeds--;
-							numCrops++;
+							numTurnipSeeds--;
+							numTurnips++;
 							break;
 						}
 					}
@@ -294,10 +294,11 @@ void getUserInput()
 				break;
 
 			case WATERING_CAN:
-				for (int i = 1; i <= numCrops; i++)
-					if (crop[i] == player)
+				for (int i = 0; i < numTurnips; i++)
+					if (turnip[i] == player)
 					{
-						crop[i].is_watered = true;
+						turnip[i].is_watered = true;
+						farm[turnip[i].y][turnip[i].x] = 16;
 						break;
 					}
 				break;
@@ -306,29 +307,31 @@ void getUserInput()
 			break;
 
 		case 'c':
-			for (int i = 1; i <= numCrops; i++)
-				if (crop[i] == player && crop[i].is_grown)
+			for (int i = 0; i < numTurnips; i++)
+				if (turnip[i] == player && turnip[i].is_grown)
 				{
-					crop[i].is_harvested = true;
-					crop[i].is_grown = false;
-					crop[i].is_watered = false;
-					crop[i].is_new = true;
-					crop[i].days_watered = 0;
-					numFruits++;
-					numCrops--;
-					if (bag[numItems - 1] != FRUIT)
+					turnip[i].is_harvested = true;
+					farm[turnip[i].y][turnip[i].x] = 8;
+					turnip[i].y = 0, turnip[i].x = 0;
+					turnip[i].is_grown = false;
+					turnip[i].is_watered = false;
+					turnip[i].is_new = true;
+					turnip[i].days_watered = 0;
+					numTurnips_h++;
+					numTurnips--;
+					if (bag[numItems - 1] != TURNIP)
 					{
-						bag[numItems] = FRUIT;
+						bag[numItems] = TURNIP;
 						numItems++;
 					}
 					break;
 				}
 
-			if (farm[player.y][player.x] == 10 && _item == FRUIT && numFruits > 0)
+			if (farm[player.y][player.x] == 10 && _item == TURNIP && numTurnips_h > 0)
 			{
-				numFruits--;
+				numTurnips_h--;
 				player.funds += 30;
-				if (numFruits < 1)
+				if (numTurnips_h < 1)
 				{
 					bag[numItems - 1] = NONE;
 					numItems--;
@@ -504,10 +507,10 @@ void menu()
 			cout << "------------------------------------------\n";
 			cout << "           |    H     |     House wall\n";
 			cout << "           |    S     |    Shipment Box\n";
-			cout << "   FARM    |    .     |     Seedling\n";
-			cout << "           |    ~     |      Sprout\n";
+			cout << "   FARM    |    .     |      Seedling\n";
+			cout << "           |    ~     |       Sprout\n";
 			cout << "           |    o     |    Watered crop\n";
-			cout << "           |    O     |   Full grown crop\n";
+			cout << "           |    T     |       Turnip\n";
 			cout << "------------------------------------------\n";
 			cout << "   STREET  |    S     |     Seed Shop\n";
 			cout << endl;
@@ -541,69 +544,69 @@ void shop()
 		cout << "Welcome! Would you like to purchase seeds?\n";
 		cout << "(Controls: v)\n\n";
 		cout << "Funds: $" << player.funds << "\n";
-		cout << "In bag: " << numSeeds << "\n\n";
-		cout << "Seed x" << num;
+		cout << "In bag: " << numTurnipSeeds << "\n\n";
+		cout << "Turnip x" << num;
 		if (num < 10) cout << "  "; else cout << " ";
 		cout << " ($" << cost << ")\n\n";
 		cin >> det;
 
 		switch (det)
 		{
-			case 'w':
-				if (num < 99) num++;
-				else num = 1;
-				break;
+		case 'w':
+			if (num < 99) num++;
+			else num = 1;
+			break;
 
-			case 's':
-				if (num > 1) num--;
-				else num = 99;
-				break;
+		case 's':
+			if (num > 1) num--;
+			else num = 99;
+			break;
 
-			case 'a':
-				num -= 10;
-				if (num <= 0) num += 100;
-				break;
-			
-			case 'd':
-				num += 10;
-				if (num > 99) num -= 100;
-				break;
+		case 'a':
+			num -= 10;
+			if (num <= 0) num += 100;
+			break;
 
-			case 'c':
-				if (cost <= player.funds)
-				{
-					numSeeds += num;
-					numCrops += num;
-					player.funds -= cost;
-					system("cls");
-				}
+		case 'd':
+			num += 10;
+			if (num > 99) num -= 100;
+			break;
 
-				else
-				{
-					cout << "\nYou cant afford that many!\n\n";
-					system("pause");
-				}
-
-				break;
-
-			case 'b':
-				cout << "\nThank you for shopping!\n\n";
-				system("pause");
-				return;
-
-			case 'v':
+		case 'c':
+			if (cost <= player.funds)
+			{
+				numTurnipSeeds += num;
+				numTurnips += num;
+				player.funds -= cost;
 				system("cls");
-				cout << "  Control  |        Action\n";
-				cout << "----------------------------------\n";
-				cout << "    w/s    |   Change number by 1\n";
-				cout << "    a/d    |   Change number by 1\n";
-				cout << "     c     |    Confirm Purchase\n";
-				cout << "     b     |      Leave Shop\n\n";
+			}
+
+			else
+			{
+				cout << "\nYou cant afford that many!\n\n";
 				system("pause");
+			}
+
+			break;
+
+		case 'b':
+			cout << "\nThank you for shopping!\n\n";
+			system("pause");
+			return;
+
+		case 'v':
+			system("cls");
+			cout << "  Control  |        Action\n";
+			cout << "----------------------------------\n";
+			cout << "    w/s    |   Change number by 1\n";
+			cout << "    a/d    |   Change number by 1\n";
+			cout << "     c     |    Confirm Purchase\n";
+			cout << "     b     |      Leave Shop\n\n";
+			system("pause");
 		}
 
 		system("cls");
-		cost = num * 30;
+		cost = num * 10;
 	}
 }
 
@@ -647,21 +650,28 @@ void checkPlayerPosition()
 				system("cls");
 				day++;
 
-				for (int i = 1; i <= numCrops; i++)
+				for (int i = 0; i < numTurnips; i++)
 				{
-					if (crop[i].is_watered)
+					if (turnip[i].is_watered)
 					{
-						crop[i].days_watered++;
-						crop[i].is_watered = false;
+						turnip[i].days_watered++;
+						turnip[i].is_watered = false;
 
-						if (crop[i].days_watered == 3)
-							crop[i].is_grown = true;
+						if (turnip[i].days_watered == 3)
+						{
+							turnip[i].is_grown = true;
+							farm[turnip[i].y][turnip[i].x] = 18;
+						}
+
+						else
+							farm[turnip[i].y][turnip[i].x] = 14;
 					}
 				}
 
 				day_end = true;
 				saveGame();
 				player.x -= 2;
+				day_end = false;
 			}
 
 			else if (det == '2')
@@ -692,23 +702,6 @@ void checkPlayerPosition()
 
 void updateDisplay()
 {
-	for (int i = 1; i <= numCrops; i++)
-	{
-		if (crop[i].is_grown)
-			farm[crop[i].y][crop[i].x] = 18;
-
-		else if (crop[i].is_watered)
-			farm[crop[i].y][crop[i].x] = 16;
-		else
-			farm[crop[i].y][crop[i].x] = 12;
-
-		if (crop[i].days_watered > 0 && !(crop[i].is_watered || crop[i].is_grown))
-			farm[crop[i].y][crop[i].x] = 14;
-
-		if (crop[i].is_harvested)
-			farm[crop[i].y][crop[i].x] = 0;
-	}
-
 	if (day > 30)
 		month++, day = 1;
 
@@ -750,23 +743,24 @@ void saveGame()
 
 	switch (map)
 	{
-		case FARM: save << 0 << endl; break;
-		case HOUSE: save << 1 << endl; break;
-		case STREET: save << 2 << endl;
+	case FARM: save << 0 << endl; break;
+	case HOUSE: save << 1 << endl; break;
+	case STREET: save << 2 << endl;
 	}
 
 	save << player.x << " " << player.y << " " << player.funds << endl;
+	save << itemNo << " " << numItems << endl;
 	save << day << " " << month << " " << year << endl;
 	save << day_end << endl;
-	save << numSeeds << " " << numCrops << " " << numFruits << endl;
+	save << numTurnipSeeds << " " << numTurnips << " " << numTurnips_h << endl;
 
 	for (int i = 0; i < numItems; i++)
 	{
 		switch (bag[i])
 		{
-			case SEED: save << 0 << " "; break;
-			case WATERING_CAN: save << 1 << " "; break;
-			case FRUIT: save << 2 << " ";
+		case TURNIPSEED: save << 0 << " "; break;
+		case WATERING_CAN: save << 1 << " "; break;
+		case TURNIP: save << 2 << " ";
 		}
 	}
 
@@ -774,15 +768,15 @@ void saveGame()
 
 	switch (_item)
 	{
-		case SEED: save << 0 << endl; break;
-		case WATERING_CAN: save << 1 << endl; break;
-		case FRUIT: save << 2 << endl;
+	case TURNIPSEED: save << 0 << endl; break;
+	case WATERING_CAN: save << 1 << endl; break;
+	case TURNIP: save << 2 << endl;
 	}
 
-	for (int i = 1; i <= numCrops; i++)
+	for (int i = 0; i < numTurnips; i++)
 	{
-		save << crop[i].x << " " << crop[i].y << " " << crop[i].is_watered << " " << crop[i].days_watered;
-		save << " " << crop[i].is_grown << " " << crop[i].is_harvested << endl;
+		save << turnip[i].x << " " << turnip[i].y << " " << turnip[i].is_watered << " " << turnip[i].days_watered;
+		save << " " << turnip[i].is_grown << " " << turnip[i].is_harvested << endl;
 	}
 
 	save.close();
@@ -813,31 +807,32 @@ void loadGame()
 	}
 
 	load >> player.x >> player.y >> player.funds;
+	load >> itemNo >> numItems;
 	load >> day >> month >> year;
 	load >> day_end;
-	load >> numSeeds >> numCrops >> numFruits;
+	load >> numTurnipSeeds >> numTurnips >> numTurnips_h;
 
 	for (int i = 0; i < numItems; i++)
 	{
 		load >> temp;
 		switch (temp)
 		{
-			case 0: bag[i] = SEED; break;
-			case 1: bag[i] = WATERING_CAN; break;
-			case 2: bag[i] = FRUIT; break;
+		case 0: bag[i] = TURNIPSEED; break;
+		case 1: bag[i] = WATERING_CAN; break;
+		case 2: bag[i] = TURNIP; break;
 		}
 	}
 
 	load >> temp;
 	switch (temp)
 	{
-		case 0: _item = SEED; break;
-		case 1: _item = WATERING_CAN; break;
-		case 2: _item = FRUIT;
+	case 0: _item = TURNIPSEED; break;
+	case 1: _item = WATERING_CAN; break;
+	case 2: _item = TURNIP;
 	}
 
-	for (int i = 1; i <= numCrops; i++)
-		load >> crop[i].x >> crop[i].y >> crop[i].is_watered >> crop[i].days_watered >> crop[i].is_grown >> crop[i].is_harvested;
+	for (int i = 0; i < numTurnips; i++)
+		load >> turnip[i].x >> turnip[i].y >> turnip[i].is_watered >> turnip[i].days_watered >> turnip[i].is_grown >> turnip[i].is_harvested;
 
 	if (day_end)
 	{
